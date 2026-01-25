@@ -29,7 +29,7 @@ idf_component_register(
     SRCS ${APP_SRCS} ${EXTRA_SRCS}
     INCLUDE_DIRS "include"  "${extra_component_path}/include"
     REQUIRES "sdmmc" "fatfs" "nvs_flash" "esp_driver_i2c" "unity"
-    PRIV_REQUIRES esp_netif esp_driver_gpio esp_driver_uart esp_wifi vfs console esp_eth openthread
+    PRIV_REQUIRES esp_netif esp_driver_gpio esp_driver_uart esp_wifi vfs console esp_eth openthread gmf_core esp_board_manager
 )
 
 if(CONFIG_EXAMPLE_PROVIDE_WIFI_CONSOLE_CMD)

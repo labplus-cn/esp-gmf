@@ -7,10 +7,10 @@ issues: "https://github.com/espressif/esp-gmf/issues"
 tags:
    - "gmf"
 
-dependencies:
-  espressif/esp_codec_dev:
-    require: "public"
-    version: "^1.4"
-  espressif/gmf_core:
-    require: public
-    version: "^0.7"
+# dependencies:
+#   espressif/esp_codec_dev:
+#     require: "public"
+#     version: "^1.4"
+#   espressif/gmf_core:
+#     require: public
+#     version: "^0.7"

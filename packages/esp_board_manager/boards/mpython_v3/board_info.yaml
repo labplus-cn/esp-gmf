@@ -1,0 +1,5 @@
+board: mpython_v3
+chip: esp32s3
+version: 1.0.0
+description: "mpython_v3"
+manufacturer: "ESPRESSIF"

@@ -7,7 +7,7 @@ issues: "https://github.com/espressif/esp-gmf/issues"
 tags:
    - "gmf"
 
-dependencies:
-  espressif/gmf_core:
-    require: public
-    version: ">=0.7"
+# dependencies:
+#   espressif/gmf_core:
+#     require: public
+#     version: ">=0.7"

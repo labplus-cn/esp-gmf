@@ -43,6 +43,11 @@ idf_component_register(
         esp_driver_mcpwm
         esp_driver_pcnt
         esp_driver_sdm
+        gen_bmgr_codes
+        esp_lcd_jd9853
+        esp_codec_dev
+        esp_video
+
     LDFRAGMENTS
         "linker.lf"
     WHOLE_ARCHIVE

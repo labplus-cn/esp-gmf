@@ -1,4 +1,7 @@
 
 idf_component_register(SRC_DIRS "src"
                        INCLUDE_DIRS "include"
-                       REQUIRES)
+                       REQUIRES
+                       gmf_audio
+                       gmf_io
+                       )

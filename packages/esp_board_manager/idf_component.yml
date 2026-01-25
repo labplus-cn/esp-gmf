@@ -7,38 +7,38 @@ tags:
 - gmf
 - board_manager
 
-examples:
-  - path: examples/play_sdcard_music
-  - path: examples/record_to_sdcard
-  - path: examples/play_embed_music
+# examples:
+#   - path: examples/play_sdcard_music
+#   - path: examples/record_to_sdcard
+#   - path: examples/play_embed_music
 
-dependencies:
-  espressif/esp_codec_dev:
-    require: public
-    version: ~1.5
-    matches:
-      - if: "$CONFIG{ESP_BOARD_DEV_AUDIO_CODEC_SUPPORT} == True"
+# dependencies:
+#   espressif/esp_codec_dev:
+#     require: public
+#     version: ~1.5
+#     matches:
+#       - if: "$CONFIG{ESP_BOARD_DEV_AUDIO_CODEC_SUPPORT} == True"
 
-  espressif/esp_lcd_touch:
-    require: public
-    version: "*"
-    matches:
-      - if: "$CONFIG{ESP_BOARD_DEV_LCD_TOUCH_I2C_SUPPORT} == True"
+#   espressif/esp_lcd_touch:
+#     require: public
+#     version: "*"
+#     matches:
+#       - if: "$CONFIG{ESP_BOARD_DEV_LCD_TOUCH_I2C_SUPPORT} == True"
 
-  espressif/esp_io_expander:
-    require: public
-    version: ^1.0.1
-    matches:
-      - if: "$CONFIG{ESP_BOARD_DEV_GPIO_EXPANDER_SUPPORT} == True"
+#   espressif/esp_io_expander:
+#     require: public
+#     version: ^1.0.1
+#     matches:
+#       - if: "$CONFIG{ESP_BOARD_DEV_GPIO_EXPANDER_SUPPORT} == True"
 
-  espressif/esp_video:
-    require: public
-    version: "^1.2.0"
-    matches:
-      - if: "$CONFIG{ESP_BOARD_DEV_CAMERA_SUPPORT} == True"
+#   espressif/esp_video:
+#     require: public
+#     version: "^1.2.0"
+#     matches:
+#       - if: "$CONFIG{ESP_BOARD_DEV_CAMERA_SUPPORT} == True"
 
-  espressif/button:
-    require: public
-    version: "^4.1.4"
-    matches:
-      - if: "$CONFIG{ESP_BOARD_DEV_BUTTON_SUPPORT} == True"
+#   espressif/button:
+#     require: public
+#     version: "^4.1.4"
+#     matches:
+#       - if: "$CONFIG{ESP_BOARD_DEV_BUTTON_SUPPORT} == True"

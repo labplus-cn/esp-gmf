@@ -10,8 +10,8 @@ tags:
    - "audio_mixer"
    - "audio_post"
 
-dependencies:
-  idf : ">=4.4"
-  espressif/gmf_audio:
-    require: public
-    version: "^0.7"
+# dependencies:
+#   idf : ">=4.4"
+#   espressif/gmf_audio:
+#     require: public
+#     version: "^0.7"

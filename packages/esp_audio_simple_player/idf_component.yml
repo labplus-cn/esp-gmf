@@ -8,8 +8,8 @@ tags:
    - "gmf"
    - "audio_player"
 
-dependencies:
-  espressif/gmf_audio:
-    version: "^0.7"
-  espressif/gmf_io:
-    version: "^0.7"
+# dependencies:
+#   espressif/gmf_audio:
+#     version: "^0.7"
+#   espressif/gmf_io:
+#     version: "^0.7"

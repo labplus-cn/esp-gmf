@@ -4,5 +4,10 @@ endif()
 
 idf_component_register(SRC_DIRS "./"
                        INCLUDE_DIRS "./include"
-                       REQUIRES ${COMPONENT_REQUIRES}
-                       PRIV_INCLUDE_DIRS "./private_include")
+                       PRIV_INCLUDE_DIRS "./private_include"
+                       REQUIRES 
+                       ${COMPONENT_REQUIRES}
+                       esp_video_codec
+                       esp_image_effects
+                       gmf_core
+)

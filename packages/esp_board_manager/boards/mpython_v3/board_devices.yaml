@@ -1,0 +1,87 @@
+board: mpython_v3
+chip: esp32s3
+version: 1.0.0
+# Devices Configuration
+devices:
+  - name: audio_dac
+    chip: es8388
+    type: audio_codec
+    version: default
+    config:
+      adc_enabled: false
+      dac_enabled: true
+      dac_max_channel: 2
+      # DAC channel mask, 1-enable, 0-disable, layout: left,right
+      dac_channel_mask: "11"     # Left enable
+      aec: false
+      # pa_type: external_pa
+      # pa_ext_pin: 1
+      # gain: 6                    # dBs
+      # active_level: 1            # 0-low, 1-high
+
+    # Power amplifier configuration
+    peripherals:
+      - name: i2s_audio_out
+      - name: i2c_master
+        address: 0x20
+        frequency: 400000          # Hz
+
+  - name: audio_adc
+    chip: es8388
+    type: audio_codec
+    version: default
+    config:
+      adc_enabled: true
+      adc_max_channel: 2
+      adc_channel_mask: "11"
+      adc_init_gain: 0           # dB
+
+    # Power amplifier configuration
+    peripherals:
+      # I2S interface configuration
+      - name: i2s_audio_in
+      # I2C interface configuration
+      - name: i2c_master
+        address: 0x20
+        frequency: 400000          # Hz
+
+  # - name: lcd_brightness
+  #   type: ledc_ctrl
+  #   version: default
+  #   config:
+  #     default_percent: 100
+  #   peripherals:
+  #     - name: ledc_backlight
+
+  - name: display_lcd
+    chip: jd9853
+    type: display_lcd
+    version: default
+    sub_type: spi
+    dependencies:
+      ../components/esp_lcd_jd9853
+    config:
+      mirror_x: true
+      mirror_y: true
+      x_max: 320
+      y_max: 172
+      need_reset: true
+      # esp_lcd_panel_io_spi_config_t fields
+      io_spi_config:
+        cs_gpio_num: 34                   # GPIO14 - LCD_CS (BSP_LCD_CS)
+        dc_gpio_num: 35                    # GPIO45 - LCD_DC (BSP_LCD_DC)
+        spi_mode: 0                       # Traditional SPI mode (0~3)
+        pclk_hz: 60000000                 # Frequency of pixel clock
+        trans_queue_depth: 1
+        flags:
+          sio_mode: false                 # Single line mode
+
+      lcd_panel_config:
+        reset_gpio_num: 34
+        rgb_ele_order: "LCD_RGB_ELEMENT_ORDER_BGR"
+        data_endian: "LCD_RGB_DATA_ENDIAN_BIG" # LCD_RGB_DATA_ENDIAN_LITTLE
+        # ST77916 specific configuration
+        vendor_config: NULL
+
+    peripherals:
+      - name: spi_display             # SPI peripheral for LCD communication
