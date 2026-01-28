@@ -61,10 +61,13 @@ devices:
     dependencies:
       ../components/esp_lcd_jd9853
     config:
+      swap_xy: true
       mirror_x: true
       mirror_y: true
       x_max: 320
       y_max: 172
+      gap_x: 0
+      gap_y: 34
       need_reset: true
       # esp_lcd_panel_io_spi_config_t fields
       io_spi_config:
@@ -73,11 +76,15 @@ devices:
         spi_mode: 0                       # Traditional SPI mode (0~3)
         pclk_hz: 60000000                 # Frequency of pixel clock
         trans_queue_depth: 1
+        lcd_cmd_bits: 8
+        lcd_param_bits: 8
+        cs_ena_pretrans: 0
+        cs_ena_posttrans: 0
         flags:
           sio_mode: false                 # Single line mode
 
       lcd_panel_config:
-        reset_gpio_num: 34
+        reset_gpio_num: -1
         rgb_ele_order: "LCD_RGB_ELEMENT_ORDER_BGR"
         data_endian: "LCD_RGB_DATA_ENDIAN_BIG" # LCD_RGB_DATA_ENDIAN_LITTLE
         # ST77916 specific configuration

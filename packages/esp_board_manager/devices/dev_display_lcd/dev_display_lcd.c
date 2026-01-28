@@ -4,7 +4,8 @@
  *
  * See LICENSE file for details.
  */
-
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "esp_log.h"
 #include "esp_board_entry.h"
 #include "esp_board_device.h"
@@ -26,6 +27,7 @@ bool lcd_dma_complete_callback(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel
 
     // 此处可在IRAM中快速处理，避免临界区
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    // ESP_EARLY_LOGE("tag", "in isr");
 
     // 通知LVGL：这一帧刷完了，可以画下一帧了
     if (lcd_handles->transfer_done_cb != NULL){
@@ -65,14 +67,23 @@ int dev_display_lcd_init(void *cfg, int cfg_size, void **device_handle)
         ESP_LOGE(TAG, "Failed to find sub device: %s", config->sub_type);
         return -1;
     }
-    if (entry_desc->init_func == NULL) {
+    if (entry_desc->init_func == NULL) { 
         ESP_LOGE(TAG, "LCD sub_type '%s' has no init function", config->sub_type);
         return -1;
     }
-    ret = entry_desc->init_func((void *)config, cfg_size, (void **)&handle);
+    ret = entry_desc->init_func((void *)config, cfg_size, (void **)&handle); //调用 dev_display_lcd_sub_spi_init()函数
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize sub device: %s", config->sub_type);
         return -1;
+    }
+
+    const esp_lcd_panel_io_callbacks_t cbs = {
+        .on_color_trans_done = lcd_dma_complete_callback,
+    };
+    /* Register done callback */
+    ret = esp_lcd_panel_io_register_event_callbacks(handle->io_handle, &cbs, handle);
+    if (ret != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to regist panel io event callback: %s", esp_err_to_name(ret));
     }
 
     // Reset LCD panel if needed
@@ -84,13 +95,18 @@ int dev_display_lcd_init(void *cfg, int cfg_size, void **device_handle)
             return -1;
         }
     }
-
+    vTaskDelay(pdMS_TO_TICKS(100));
     // Initialize LCD panel
     ret = esp_lcd_panel_init(handle->panel_handle);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize LCD panel: %s", esp_err_to_name(ret));
         entry_desc->deinit_func(handle);
         return -1;
+    }
+
+    ret = esp_lcd_panel_invert_color(handle->panel_handle, config->invert_color );
+    if (ret != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to invert LCD panel: %s", esp_err_to_name(ret));
     }
 
     ret = esp_lcd_panel_mirror(handle->panel_handle, config->mirror_x, config->mirror_y);
@@ -111,7 +127,10 @@ int dev_display_lcd_init(void *cfg, int cfg_size, void **device_handle)
         }
     }
 
-    // lcd_set_color(handle, GUI_Black);
+    ret = esp_lcd_panel_set_gap(handle->panel_handle, config->gap_x, config->gap_y);
+    if (ret != ESP_OK) {
+        ESP_LOGW(TAG, "Failed to set LCD panel gap: %s", esp_err_to_name(ret));
+    }
     
     if (BOARD_LCD_BL >= 0) {
         gpio_config_t io_conf = {
@@ -129,12 +148,14 @@ int dev_display_lcd_init(void *cfg, int cfg_size, void **device_handle)
     *device_handle = handle;
 
     handle->dma_finish_sem = xSemaphoreCreateBinary();
+    
     // handle->lcd_buf = (uint16_t *)heap_caps_aligned_alloc(32, AREA_BYTES,   MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
-    handle->lcd_buf = (uint16_t *)heap_caps_aligned_alloc(32, config->lcd_width*config->lcd_height*2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);  // MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
+    handle->lcd_buf = (uint16_t *)heap_caps_aligned_alloc(32, config->lcd_width * config->lcd_height *2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);  // MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA | MALLOC_CAP_8BIT);
     assert(handle != NULL);
     // memset(handle->lcd_buf, 0, AREA_BYTES);
-    memset(handle->lcd_buf, 0, config->lcd_width*config->lcd_height*2);
+    memset(handle->lcd_buf, 0, config->lcd_width * config->lcd_height * 2);
 
+    lcd_set_color(handle, GUI_Black);
     return 0;
 }
 
@@ -173,9 +194,7 @@ void lcd_draw_logo(void *device_handle)
     dev_display_lcd_handles_t *lcd_handles = (dev_display_lcd_handles_t *)device_handle;
     assert(lcd_handles != NULL);
     dev_display_lcd_config_t *cfg = NULL;
-    ESP_LOGE(TAG, " device 3");
     esp_board_device_get_config_by_handle(device_handle, (void **)&cfg);
-    ESP_LOGE(TAG, " device 4");
     memcpy(lcd_handles->lcd_buf, logo_en_320x172_lcd, cfg->lcd_width* cfg->lcd_height* sizeof(uint16_t));
     xSemaphoreTake(lcd_handles->dma_finish_sem, portMAX_DELAY);
     esp_lcd_panel_draw_bitmap(lcd_handles->panel_handle, 0, 0, cfg->lcd_width, cfg->lcd_height, (uint16_t *)lcd_handles->lcd_buf);
@@ -186,7 +205,6 @@ void lcd_set_color(void *device_handle, int color)
     dev_display_lcd_handles_t *lcd_handles = (dev_display_lcd_handles_t *)device_handle;
     assert(lcd_handles != NULL);
     dev_display_lcd_config_t *cfg = NULL;
-    ESP_LOGE(TAG, " device 2: %p", lcd_handles);
     esp_board_device_get_config_by_handle(lcd_handles, (void **)&cfg);
     uint16_t *buffer = (uint16_t *)malloc(cfg->lcd_width * sizeof(uint16_t));
     if (NULL == buffer){
@@ -198,6 +216,7 @@ void lcd_set_color(void *device_handle, int color)
         }
 
         for (int y = 0; y < cfg->lcd_height; y++){
+            // xSemaphoreTake(lcd_handles->dma_finish_sem, portMAX_DELAY);
             esp_lcd_panel_draw_bitmap(lcd_handles->panel_handle, 0, y, cfg->lcd_width, y+1, buffer);
         }
 
@@ -211,6 +230,7 @@ void lcd_draw_image(void *device_handle, int x, int y, int width, int height, co
     assert(lcd_handles != NULL);
     dev_display_lcd_config_t *cfg = NULL;
     esp_board_device_get_config_by_handle(device_handle, (void **)&cfg);
+    xSemaphoreTake(lcd_handles->dma_finish_sem, portMAX_DELAY);
     esp_lcd_panel_draw_bitmap(lcd_handles->panel_handle, x, y, (width > cfg->lcd_width)? cfg->lcd_width : width, (height > cfg->lcd_height)? cfg->lcd_height : height, (uint16_t *)buff);
 }
 

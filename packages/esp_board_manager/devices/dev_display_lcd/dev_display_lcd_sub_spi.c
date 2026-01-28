@@ -42,7 +42,7 @@ int dev_display_lcd_sub_spi_init(void *cfg, int cfg_size, void **device_handle)
         goto cleanup;
     }
 
-    ESP_LOGD(TAG, "SPI PORT:%d, cs_gpio=%d, dc_gpio=%d, spi_mode=%d, pclk_hz=%d, trans_queue_depth=%d, lcd_cmd_bits=%d, lcd_param_bits=%d, cs_ena_pretrans=%d, cs_ena_posttrans=%d, flags: dc_high_on_cmd=%d, dc_low_on_data=%d, dc_low_on_param=%d, octal_mode=%d, quad_mode=%d, sio_mode=%d, lsb_first=%d, cs_high_active=%d",
+    ESP_LOGI(TAG, "SPI PORT:%d, cs_gpio=%d, dc_gpio=%d, spi_mode=%d, pclk_hz=%d, trans_queue_depth=%d, lcd_cmd_bits=%d, lcd_param_bits=%d, cs_ena_pretrans=%d, cs_ena_posttrans=%d, flags: dc_high_on_cmd=%d, dc_low_on_data=%d, dc_low_on_param=%d, octal_mode=%d, quad_mode=%d, sio_mode=%d, lsb_first=%d, cs_high_active=%d",
              spi_handle->spi_port,
              lcd_cfg->sub_cfg.spi.io_spi_config.cs_gpio_num,
              lcd_cfg->sub_cfg.spi.io_spi_config.dc_gpio_num,
@@ -63,10 +63,6 @@ int dev_display_lcd_sub_spi_init(void *cfg, int cfg_size, void **device_handle)
              lcd_cfg->sub_cfg.spi.io_spi_config.flags.cs_high_active);
 
     // Create LCD panel IO using the configured IO SPI config
-    esp_lcd_panel_io_spi_config_t spi_config;
-    memcpy(&spi_config, &lcd_cfg->sub_cfg.spi.io_spi_config, sizeof(esp_lcd_panel_io_spi_config_t));
-    spi_config.on_color_trans_done = lcd_dma_complete_callback;
-    spi_config.user_ctx = lcd_handles;
     esp_err_t ret = esp_lcd_new_panel_io_spi(spi_handle->spi_port, &lcd_cfg->sub_cfg.spi.io_spi_config, &lcd_handles->io_handle);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to create LCD panel IO: %s", esp_err_to_name(ret));

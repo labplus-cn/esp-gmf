@@ -273,6 +273,8 @@ typedef struct {
     const char              *sub_type;          /*!< Sub type (dsi or spi) */
     uint16_t                 lcd_width;         /*!< LCD width */
     uint16_t                 lcd_height;        /*!< LCD height */
+    uint8_t                  gap_x;
+    uint8_t                  gap_y;
     uint8_t                  swap_xy      : 1;  /*!< Swap X and Y coordinates */
     uint8_t                  mirror_x     : 1;  /*!< Mirror X coordinates */
     uint8_t                  mirror_y     : 1;  /*!< Mirror Y coordinates */

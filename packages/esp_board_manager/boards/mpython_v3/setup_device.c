@@ -8,6 +8,7 @@
 #include "esp_log.h"
 #include "esp_lcd_jd9853.h"
 #include "dev_display_lcd.h"
+#include <string.h>
 
 #include "driver/gpio.h"
 
