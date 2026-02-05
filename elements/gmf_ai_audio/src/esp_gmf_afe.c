@@ -29,6 +29,7 @@
 #include "esp_gmf_caps_def.h"
 #include "esp_gmf_method.h"
 #include "esp_gmf_ai_audio_methods.h"
+#include "esp_mn_speech_commands.h"
 
 #define AFE_DEFAULT_DATA_SIZE     (2048)
 #define WAKEUP_ST_SET(handle, st) (handle->wakeup_state = st)
@@ -492,7 +493,9 @@ static esp_gmf_job_err_t esp_gmf_afe_open(esp_gmf_audio_element_handle_t self, v
         ESP_GMF_NULL_CHECK(TAG, gmf_afe->mn_lock, return ESP_GMF_JOB_ERR_FAIL);
         gmf_afe->mn_state = ESP_MN_STATE_TIMEOUT;
 
-        esp_mn_commands_update_from_sdkconfig((esp_mn_iface_t *)gmf_afe->multinet, gmf_afe->mn_handle);
+        // esp_mn_commands_update_from_sdkconfig((esp_mn_iface_t *)gmf_afe->multinet, gmf_afe->mn_handle);
+        esp_mn_commands_clear();
+        esp_mn_commands_update();
     }
     esp_gmf_db_new_ringbuf(2, buf_size, &gmf_afe->in_db);
     esp_gmf_db_new_ringbuf(1, buf_size * 2 + (cfg->delay_samples * sizeof(uint16_t)), &gmf_afe->out_db);
