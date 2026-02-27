@@ -166,8 +166,12 @@ static int __setup_pipeline(esp_audio_simple_player_t *player, const char *uri, 
         in_str = strndup("io_http", strlen("io_http"));
         free(uri_st->scheme);
         uri_st->scheme = in_str;
+    // } else if (strcasecmp(uri_st->scheme, "file") == 0) {
+    //     in_str = strndup("io_file", strlen("io_file"));
+    //     free(uri_st->scheme);
+    //     uri_st->scheme = in_str;
     } else if (strcasecmp(uri_st->scheme, "file") == 0) {
-        in_str = strndup("io_file", strlen("io_file"));
+        in_str = strndup("io_lfs2", strlen("io_lfs2"));
         free(uri_st->scheme);
         uri_st->scheme = in_str;
     } else if (strcasecmp(uri_st->scheme, "embed") == 0) {

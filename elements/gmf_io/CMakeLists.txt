@@ -8,7 +8,7 @@ foreach(item IN LISTS build_components)
     endif()
 endforeach()
 
-list(APPEND io_srcs "esp_gmf_io_file.c" "esp_gmf_io_embed_flash.c" "esp_gmf_io_i2s_pdm.c" "esp_gmf_io_http.c" "http_lib/gzip/gzip_miniz.c")
+list(APPEND io_srcs "esp_gmf_io_file.c" "esp_gmf_io_lfs2.c" "esp_gmf_io_embed_flash.c" "esp_gmf_io_i2s_pdm.c" "esp_gmf_io_http.c" "http_lib/gzip/gzip_miniz.c")
 if(index EQUAL -1)
     set(io_inc "")
 else()
@@ -20,9 +20,10 @@ endif()
 idf_component_register(SRCS ${io_srcs}
                        INCLUDE_DIRS ./include ${io_inc} "http_lib/gzip/" "http_lib/gzip/include"
                        PRIV_INCLUDE_DIRS ""
-                       REQUIRES 
+                       REQUIRES
                        driver
                        esp_http_client
                        esp_codec_dev
                        gmf_core
+                       joltwallet__littlefs
 )

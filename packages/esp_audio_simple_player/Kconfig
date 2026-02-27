@@ -7,15 +7,21 @@ menu "ESP Audio Simple Player"
             help
                 Include support for HTTP IO stream in the audio player.
 
-        config ESP_AUDIO_SIMPLE_PLAYER_FILE_EN
-            bool "Enable FILE IO stream"
+        config ESP_AUDIO_SIMPLE_PLAYER_LFS2_EN
+            bool "Enable LFS2 IO stream"
             default y
+            help
+                Include support for LFS2 IO stream in the audio player.
+
+            config ESP_AUDIO_SIMPLE_PLAYER_FILE_EN
+            bool "Enable FILE IO stream"
+            default n
             help
                 Include support for FILE IO stream in the audio player.
 
         config ESP_AUDIO_SIMPLE_PLAYER_EMBED_FLASH_EN
             bool "Enable Embedded Flash IO stream"
-            default y
+            default n
             help
                 Include support for Embedded Flash IO stream in the audio player.
     endmenu
@@ -32,7 +38,7 @@ menu "ESP Audio Simple Player"
 
             config AUDIO_SIMPLE_PLAYER_RESAMPLE_DEST_RATE
                 int "Destination sample rate for resampling"
-                default 48000
+                default 16000
                 range 8000 96000
                 help
                     Set the target sample rate for audio resampling.

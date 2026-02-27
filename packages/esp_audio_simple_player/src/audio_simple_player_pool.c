@@ -26,6 +26,23 @@ void asp_pool_register_io(esp_asp_handle_t handle)
     esp_gmf_pool_register_io(player->pool, http, NULL);
 #endif  /* CONFIG_ESP_AUDIO_SIMPLE_PLAYER_HTTP_EN */
 
+#ifdef CONFIG_ESP_AUDIO_SIMPLE_PLAYER_LFS2_EN
+#include "esp_gmf_io_lfs2.h"
+#include "esp_littlefs.h"
+    esp_vfs_littlefs_conf_t lfs_conf = {
+        .base_path              = "/littlefs",
+        .partition_label        = "vfs",
+        .format_if_mount_failed = false,
+        .dont_mount             = false,
+    };
+    ESP_ERROR_CHECK(esp_vfs_littlefs_register(&lfs_conf));
+    lfs2_io_cfg_t lfs2_cfg = LFS2_IO_CFG_DEFAULT();
+    lfs2_cfg.dir = ESP_GMF_IO_DIR_READER;
+    esp_gmf_io_handle_t lfs2 = NULL;
+    esp_gmf_io_lfs2_init(&lfs2_cfg, &lfs2);
+    esp_gmf_pool_register_io(player->pool, lfs2, NULL);
+#endif  /* CONFIG_ESP_AUDIO_SIMPLE_PLAYER_LFS2_EN */
+
 #ifdef CONFIG_ESP_AUDIO_SIMPLE_PLAYER_FILE_EN
 #include "esp_gmf_io_file.h"
     file_io_cfg_t fs_cfg = FILE_IO_CFG_DEFAULT();
