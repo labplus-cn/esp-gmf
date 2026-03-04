@@ -660,6 +660,10 @@ static esp_gmf_err_t _load_afe_caps_func(esp_gmf_element_handle_t handle)
     afe_caps.attr_fun = NULL;
     ret = esp_gmf_cap_append(&caps, &afe_caps);
     ESP_GMF_RET_ON_NOT_OK(TAG, ret, { return ret;}, "Failed to create VCMD capability");
+    afe_caps.cap_eightcc = ESP_GMF_CAPS_AUDIO_CHANNEL_CONVERT;
+    afe_caps.attr_fun = NULL;
+    ret = esp_gmf_cap_append(&caps, &afe_caps);
+    ESP_GMF_RET_ON_NOT_OK(TAG, ret, { return ret;}, "Failed to create CHANNEL_CONVERT capability");
 
     esp_gmf_element_t *el = (esp_gmf_element_t *)handle;
     el->caps = caps;
@@ -687,6 +691,13 @@ static esp_gmf_err_t __afe_set_vcmd_det(esp_gmf_audio_element_handle_t handle, e
     return ESP_GMF_ERR_INVALID_STATE;
 }
 
+static esp_gmf_err_t __afe_set_dest_ch(esp_gmf_element_handle_t handle, esp_gmf_args_desc_t *arg_desc,
+    uint8_t *buf, int buf_len)
+{
+    /* AFE always outputs mono; accept this call to satisfy format negotiation */
+    return ESP_GMF_ERR_OK;
+}
+
 static esp_gmf_err_t _load_afe_methods_func(esp_gmf_element_handle_t handle)
 {
     esp_gmf_method_t *method = NULL;
@@ -696,6 +707,12 @@ static esp_gmf_err_t _load_afe_methods_func(esp_gmf_element_handle_t handle)
     ESP_GMF_RET_ON_NOT_OK(TAG, ret, {return ret;}, "Failed to append vcmd det argument");
     ret = esp_gmf_method_append(&method, ESP_GMF_METHOD_AFE_START_VCMD_DET, __afe_set_vcmd_det, set_args);
     ESP_GMF_RET_ON_ERROR(TAG, ret, {return ret;}, "Failed to register %s method", ESP_GMF_METHOD_AFE_START_VCMD_DET);
+
+    esp_gmf_args_desc_t *ch_args = NULL;
+    ret = esp_gmf_args_desc_append(&ch_args, "channel", ESP_GMF_ARGS_TYPE_UINT8, sizeof(uint8_t), 0);
+    ESP_GMF_RET_ON_NOT_OK(TAG, ret, {return ret;}, "Failed to append dest_ch argument");
+    ret = esp_gmf_method_append(&method, "set_dest_ch", __afe_set_dest_ch, ch_args);
+    ESP_GMF_RET_ON_ERROR(TAG, ret, {return ret;}, "Failed to register set_dest_ch method");
 
     esp_gmf_element_t *el = (esp_gmf_element_t *)handle;
     el->method = method;
