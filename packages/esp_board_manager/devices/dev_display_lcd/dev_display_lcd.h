@@ -20,7 +20,21 @@
 extern "C" {
 #endif  /* __cplusplus */
 
+#if CONFIG_MPYTHON_V3_BOARD ||CONFIG_LABPLUS_XUNFEI_JS_MIDDLE_BOARD
 #define BOARD_LCD_BL 33
+#elif CONFIG_LABPLUS_XUNFEI_JS_PRIMARY_BOARD
+#define BOARD_LCD_BL 34
+#elif CONFIG_LABPLUS_LEDONG_V2_BOARD
+#define BOARD_LCD_BL -1
+#endif
+
+#if CONFIG_LABPLUS_LEDONG_V2_BOARD
+#define BOARD_STM8_ADDR 17
+#define BOARD_STM8_CMD 4
+#elif CONFIG_LABPLUS_XUNFEI_JS_PRIMARY_BOARD
+#define BOARD_STM8_ADDR 15
+#define BOARD_STM8_CMD 8
+#endif
 
 //---------------------颜色表--------------------
 /*

@@ -15,6 +15,8 @@
 #include "esp_board_entry.h"
 #include "periph_spi.h"
 #include "dev_display_lcd.h"
+#include "driver/i2c_master.h"
+#include "esp_board_manager.h"
 
 static const char *TAG = "DEV_DISPLAY_LCD_SUB_SPI";
 
@@ -69,6 +71,21 @@ int dev_display_lcd_sub_spi_init(void *cfg, int cfg_size, void **device_handle)
         esp_board_periph_unref_handle(lcd_cfg->sub_cfg.spi.spi_name);
         goto cleanup;
     }
+
+    #if CONFIG_LABPLUS_LEDONG_V2_BOARD || CONFIG_LABPLUS_XUNFEI_JS_PRIMARY_BOARD
+        i2c_master_bus_handle_t bus_handle = NULL;
+        esp_board_manager_get_periph_handle(ESP_BOARD_PERIPH_NAME_I2C_MASTER, (void **)&bus_handle);
+        i2c_device_config_t stm8_dev_cfg = {
+            .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+            .device_address = BOARD_STM8_ADDR,
+            .scl_speed_hz = 100000,
+        };
+        i2c_master_dev_handle_t stm8_dev_handle = NULL;
+        i2c_master_bus_add_device(bus_handle, &stm8_dev_cfg, &stm8_dev_handle);
+        uint8_t reg = BOARD_STM8_CMD;
+        i2c_master_transmit(stm8_dev_handle, &reg, 1, 1000 / portTICK_PERIOD_MS);
+        i2c_master_bus_rm_device(stm8_dev_handle);
+    #endif
 
     ret = lcd_panel_factory_entry_t(lcd_handles->io_handle, &lcd_cfg->sub_cfg.spi.panel_config, &lcd_handles->panel_handle);
     if (ret != ESP_OK) {
