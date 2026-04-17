@@ -17,7 +17,7 @@
 #define TAG "GMF_PATH_MNGR"
 
 #define CAPTURE_GMF_TASK_DEFAULT_PRIORITY   10
-#define CAPTURE_GMF_TASK_DEFAULT_STACK_SIZE (4 * 1024)
+#define CAPTURE_GMF_TASK_DEFAULT_STACK_SIZE (8 * 1024)
 
 static esp_capture_err_t get_pipelines(gmf_capture_path_mngr_t *mngr)
 {
