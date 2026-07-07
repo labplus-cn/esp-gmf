@@ -15,8 +15,10 @@
 #include "logo_mpython_v3_320x172_lcd.h"
 #elif CONFIG_LABPLUS_LEDONG_V2_BOARD
 #include "logo_labplus_ledong_v2_320x172_lcd.h"
-#elif CONFIG_LABPLUS_XUNFEI_JS_PRIMARY_BOARD || CONFIG_LABPLUS_XUNFEI_JS_MIDDLE_BOARD || CONFIG_LABPLUS_XUEJING_V2_BOARD
+#elif CONFIG_LABPLUS_XUNFEI_JS_PRIMARY_BOARD || CONFIG_LABPLUS_XUNFEI_JS_MIDDLE_BOARD 
 #include "logo_xunfei_320x172_lcd.h"
+#elif  CONFIG_LABPLUS_XUEJING_V2_BOARD
+#include "logo_xuejingv2_320x172_lcd.h"
 #endif
 #include "driver/gpio.h"
 
