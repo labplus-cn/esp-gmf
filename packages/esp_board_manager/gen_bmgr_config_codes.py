@@ -369,6 +369,11 @@ help
         role_upper = role_str.upper().replace('-', '_')
         return f'ESP_BOARD_PERIPH_ROLE_{role_upper}'
 
+    @staticmethod
+    def _is_board_manager_module_header(include: str) -> bool:
+        """Return True for generated board-manager device/peripheral module headers."""
+        return include.endswith('.h') and (include.startswith('periph_') or include.startswith('dev_'))
+
     def write_periph_c(self, periph_structs, peripherals, periph_parsers, out_path: str):
         """Write peripheral configuration C file"""
         # Ensure output directory exists
@@ -378,6 +383,7 @@ help
             f.write(self.get_license_header('Auto-generated peripheral configuration file'))
             f.write('#include <stdlib.h>\n')
             f.write('#include "esp_board_periph.h"\n')
+            f.write('#include "esp_board_manager_includes.h"\n')
 
             # Collect and write all required headers from peripheral modules
             all_includes = set()
@@ -391,6 +397,8 @@ help
 
             # Write collected headers
             for include in sorted(all_includes):
+                if self._is_board_manager_module_header(include):
+                    continue
                 f.write(f'#include "{include}"\n')
             f.write('\n')
 
@@ -492,6 +500,7 @@ help
             f.write(self.get_license_header('Auto-generated device configuration file'))
             f.write('#include <stdlib.h>\n')
             f.write('#include "esp_board_device.h"\n')
+            f.write('#include "esp_board_manager_includes.h"\n')
 
             # Collect and write all required headers from device modules
             all_includes = set()
@@ -505,10 +514,14 @@ help
 
             # Write collected headers
             for include in sorted(all_includes):
+                if self._is_board_manager_module_header(include):
+                    continue
                 f.write(f'#include "{include}"\n')
 
             # Add extra headers from extra_dev configurations
             for include in sorted(extra_includes):
+                if self._is_board_manager_module_header(include):
+                    continue
                 f.write(f'#include "{include}"\n')
 
             # Check if there are custom devices and include custom header
@@ -607,10 +620,7 @@ help
             f.write(self.get_license_header('Auto-generated peripheral handle definition file'))
             f.write('#include <stddef.h>\n')
             f.write('#include "esp_board_periph.h"\n')
-
-            # Include peripheral-specific header files
-            for type_name, _ in sorted(periph_types):
-                f.write(f'#include "periph_{type_name}.h"\n')
+            f.write('#include "esp_board_manager_includes.h"\n')
             f.write('\n')
 
             # Check if peripheral types list is empty
@@ -658,11 +668,7 @@ help
             f.write(self.get_license_header('Auto-generated device handle definition file'))
             f.write('#include <stddef.h>\n')
             f.write('#include "esp_board_device.h"\n')
-
-            # Include device-specific header files
-            device_types = set(d.type for d in devices)
-            for dev_type in sorted(device_types):
-                f.write(f'#include "dev_{dev_type}.h"\n')
+            f.write('#include "esp_board_manager_includes.h"\n')
             f.write('\n')
 
             # Check if devices list is empty
